@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import * as signalR from '@microsoft/signalr';
 import emitter from '../bus';
 
 export default {
@@ -54,6 +55,22 @@ export default {
       this.receiveData = payload;
       console.log(`telemetryEvent: ${JSON.stringify(this.receiveData)}`);
     });
+    this.receiveSignalR();
+  },
+  methods: {
+    async receiveSignalR() {
+      // ./ngrok http 8080
+      const apiBaseUrl = 'https://streaming-sample.azurewebsites.net';
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl(`${apiBaseUrl}/api`)
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+      connection.on('newMessage', (message) => {
+        console.log(`message: ${JSON.stringify(message)}`);
+      });
+      connection.start()
+        .catch(console.error);
+    },
   },
   // beforeUnmount() {
   //   bus.all.clear();
