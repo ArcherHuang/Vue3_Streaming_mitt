@@ -34,6 +34,40 @@
         </tbody>
       </table>
     </div>
+    <h3 class="m-5 "><b>Real-time Data from Edge & SignalR</b></h3>
+    <div class="table-data">
+      <!-- {{ receiveData }} -->
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th class="text-center" scope="col">DeviceID</th>
+            <th class="text-center" scope="col">Latitude</th>
+            <th class="text-center" scope="col">Longitude</th>
+            <th class="text-center" scope="col">Telemetry</th>
+            <th class="text-center" scope="col">DateTime</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hover-table">
+            <td class="position-relative text-center pt-3">
+              {{ receiveSignalRData.id }}
+            </td>
+            <td class="position-relative text-center pt-3">
+              {{ receiveSignalRData.latitude }}
+            </td>
+            <td class="position-relative text-center pt-3">
+              {{ receiveSignalRData.longitude }}
+            </td>
+            <td class="position-relative text-center pt-3">
+              {{ receiveSignalRData.telemetry }}
+            </td>
+            <td class="position-relative text-center pt-3">
+              {{ receiveSignalRData.timestamp }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -46,6 +80,7 @@ export default {
   data() {
     return {
       receiveData: {},
+      receiveSignalRData: {},
     };
   },
   components: {
@@ -59,14 +94,14 @@ export default {
   },
   methods: {
     async receiveSignalR() {
-      // ./ngrok http 8080
       const apiBaseUrl = 'https://streaming-sample.azurewebsites.net';
       const connection = new signalR.HubConnectionBuilder()
         .withUrl(`${apiBaseUrl}/api`)
         .configureLogging(signalR.LogLevel.Information)
         .build();
       connection.on('newMessage', (message) => {
-        console.log(`message: ${JSON.stringify(message)}`);
+        console.log(`SignalR_message: ${JSON.stringify(message)}`);
+        this.receiveSignalRData = message;
       });
       connection.start()
         .catch(console.error);
